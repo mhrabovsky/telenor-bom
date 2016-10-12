@@ -1,0 +1,52 @@
+-- NAS 10.04 beégetések bõvítése
+SET @ACCT_RELA_ID = LEGACY.CONFIG('ACCT_RELA_ID',100000000);
+SET @OFFER_TYPE_MAIN = LEGACY.CONFIG('OFFER_TYPE_MAIN',NULL);
+
+INSERT INTO MDM.INS_ACCREL
+(
+TENANT_ID,
+ACCT_RELA_ID, 
+OFFER_INST_ID,
+USER_ID,
+ACCT_ID,
+PAY_TYPE,
+TOGETHER_FLAG,
+ITEM_TYPE,
+ITEM_ID,
+PAY_MODE,
+PAY_VALUE,
+EFFECTIVE_DATE,
+EXPIRE_DATE,
+STATE,
+GRP_SPLIT_ID)
+
+SELECT  
+	DISTINCT 
+    '22',
+CONCAT(@ACCT_RELA_ID,@rownum := @rownum + 1) as ACCT_RELA_ID,
+O.OFFER_INST_ID,
+O.USER_ID,	
+-- CONCAT (BAN,'_',BEN	), 
+-- jav. mgy 2016.05.11 Tom köztes táblájában levõ ben=-1-ek a LEGACY.USER tanusága szerint 1-ek
+	concat(U.BAN,'_',abs(U.BEN)),
+  	  '1', -- PAY_TYPE
+	null,
+	'1', -- ITEM_TYPE
+	null,
+	'0', -- PAY_MODE
+	null,
+	O.EFFECTIVE_DATE,
+	O.EXPIRE_DATE,
+	/*	CASE WHEN O.EXPIRE_DATE < SYSDATE() THEN '0'
+		ELSE '1'
+		END*/
+	O.STATE, -- ABO 07/07
+	null
+    FROM 
+    LEGACY.M_USER U, MDM.INS_OFFER O, (select @rownum :=0) r
+WHERE 1=1
+AND U.Sub_Id = O.USER_ID
+AND O.OFFER_TYPE = @OFFER_TYPE_MAIN;
+
+
+

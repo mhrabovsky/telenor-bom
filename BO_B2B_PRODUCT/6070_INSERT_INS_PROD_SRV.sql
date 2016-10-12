@@ -1,0 +1,73 @@
+-- NAS 10.04 beégetések bõvítése
+SET @PROD_SRV_RELAT_ID = LEGACY.CONFIG('PROD_SRV_RELAT_ID',null);
+
+INSERT INTO MDM.INS_PROD_INS_SRV
+(
+     TENANT_ID
+    ,PROD_SRV_RELAT_ID
+    ,OFFER_INST_ID
+    ,PROD_INST_ID
+    ,USER_ID
+    ,SERVICE_ID
+    ,STATE
+)
+
+SELECT * FROM
+(
+    SELECT
+        '22'
+        ,CONCAT (X.SOC_SEQ_NO, X.FEATURE_SEQ_NO, X.VERIS_SERVICE_ID)
+        ,CONCAT(X.MAIN_SOC_SEQ_NO,X.VERIS_OFFER_ID)							AS OFFER_INST_ID
+        ,CASE WHEN FEATURE_SEQ_NO IS NOT NULL
+            THEN concat(VERIS_PRODUCT_ID,CTN,MAIN_SOC_SEQ_NO, RIGHT(X.VERIS_OFFER_ID, 4))
+          ELSE CONCAT(SOC_SEQ_NO,CTN)
+		 END                                                                AS PROD_INST_ID
+        ,X.USER_ID
+        ,X.VERIS_SERVICE_ID
+        ,'1'
+
+    FROM LEGACY.SOC_FEATURE_OFFER_MAPPING X
+    JOIN (select @rownum :=0) r
+        on 1 = 1
+    WHERE   X.VERIS_PRODUCT_ID IS NOT NULL
+        AND X.VERIS_SERVICE_ID IS NOT NULL
+    -- AND X.CTN IN (SELECT DISTINCT CTN FROM LEGACY.SOC_FEATURE_OFFER_MAPPING WHERE OFFER_TYPE = 'T')
+    ) Y
+;
+
+
+--
+-- A Pandocs agon bekerult elofizetok "B2C-like" utanakuldese
+-- mgy 2016.08.24
+--
+
+call LEGACY.createindex_ifnotexists('MDM','INS_PROD_INS_SRV','OFFER_INST_ID');
+
+INSERT INTO MDM.INS_PROD_INS_SRV
+(
+     TENANT_ID
+    ,PROD_SRV_RELAT_ID
+    ,OFFER_INST_ID
+    ,PROD_INST_ID
+    ,USER_ID
+    ,SERVICE_ID
+    ,STATE
+)
+SELECT 
+'22' TENANT_ID, 
+CONCAT(@PROD_SRV_RELAT_ID, @rownum := @rownum + 1) ,
+P.OFFER_INST_ID,
+P.PROD_INST_ID,
+P.USER_ID,
+I.SERV_ID,
+P.STATE
+FROM MDM.INS_PROD P
+join (select distinct PRODUCT_ID PROD_ID, SERVICE_ID SERV_ID from LEGACY.M_IDID_ATTR_LDR) I
+on P.PROD_ID = I.PROD_ID
+join (select @rownum:=0) r on 1=1
+left outer join MDM.INS_PROD_INS_SRV PS
+on P.OFFER_INST_ID=PS.OFFER_INST_ID
+WHERE PS.OFFER_INST_ID is null
+-- and P.OFFER_INST_ID = '35078052320010022'
+;    
+

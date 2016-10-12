@@ -1,0 +1,191 @@
+use LEGACY;
+create table top_100_ctn as 
+select '203176140' ctn union all
+select '203305381' ctn union all
+select '209249595' ctn union all
+select '209280540' ctn union all
+select '209336996' ctn union all
+select '209466391' ctn union all
+select '209816463' ctn union all
+select '203833369' ctn union all
+select '203691697' ctn union all
+select '204742639' ctn union all
+select '202036344' ctn union all
+select '205553914' ctn union all
+select '205765185' ctn union all
+select '202226061' ctn union all
+select '209661381' ctn union all
+select '204597868' ctn union all
+select '206620149' ctn union all
+select '206622412' ctn union all
+select '209829228' ctn union all
+select '206623252' ctn union all
+select '203206191' ctn union all
+select '202044326' ctn union all
+select '207710453' ctn union all
+select '205331577' ctn union all
+select '204982601' ctn union all
+select '204982670' ctn union all
+select '209770035' ctn union all
+select '203238746' ctn union all
+select '205972057' ctn union all
+select '203291818' ctn union all
+select '205550717' ctn union all
+select '206209477' ctn union all
+select '208550563' ctn union all
+select '208571893' ctn union all
+select '208592008' ctn union all
+select '208596513' ctn union all
+select '202841432' ctn union all
+select '208550566' ctn union all
+select '208550567' ctn union all
+select '208550568' ctn union all
+select '208599520' ctn union all
+select '208555687' ctn union all
+select '208549652' ctn union all
+select '208549829' ctn union all
+select '208542133' ctn union all
+select '208421395' ctn union all
+select '202425159' ctn union all
+select '204778975' ctn union all
+select '202611603' ctn union all
+select '204336663' ctn union all
+select '202134383' ctn union all
+select '202982527' ctn union all
+select '203203556' ctn union all
+select '203305664' ctn union all
+select '203834455' ctn union all
+select '209111941' ctn union all
+select '209119294' ctn union all
+select '209119866' ctn union all
+select '209145755' ctn union all
+select '209204121' ctn union all
+select '202031373' ctn union all
+select '203181999' ctn union all
+select '204767485' ctn union all
+select '203416406' ctn union all
+select '202204596' ctn union all
+select '209715299' ctn union all
+select '204864546' ctn union all
+select '204833219' ctn union all
+select '202840131' ctn union all
+select '202737854' ctn union all
+select '204833237' ctn union all
+select '202711811' ctn union all
+select '202996517' ctn union all
+select '204043634' ctn union all
+select '208251000' ctn union all
+select '207799620' ctn union all
+select '208830000' ctn union all
+select '208560000' ctn union all
+select '208837800' ctn union all
+select '208810110' ctn union all
+select '202622262' ctn union all
+select '209052227' ctn union all
+select '207771100' ctn union all
+select '204628484' ctn union all
+select '203161025' ctn union all
+select '203405952' ctn union all
+select '203433802' ctn union all
+select '209129130' ctn union all
+select '209372474' ctn union all
+select '209375527' ctn union all
+select '209380868' ctn union all
+select '209386601' ctn union all
+select '209495946' ctn union all
+select '209562067' ctn union all
+select '209728632' ctn union all
+select '209730298' ctn union all
+select '209805361' ctn union all
+select '203885611' ctn union all
+select '204650523' ctn union all
+select '209135427' ctn union all
+select '205449585' ctn union all
+select '204745018' ctn union all
+select '203124941' ctn union all
+select '203169858' ctn union all
+select '205564170' ctn union all
+select '205599711' ctn union all
+select '204501295' ctn union all
+select '202126831' ctn union all
+select '203176533' ctn union all
+select '202424350' ctn union all
+select '203299851' ctn union all
+select '203471007' ctn union all
+select '205050461' ctn union all
+select '204819859' ctn union all
+select '205224761' ctn union all
+select '204293783' ctn union all
+select '202213731' ctn union all
+select '305716206' ctn union all
+select '203559983' ctn union all
+select '209302005' ctn union all
+select '203332222' ctn union all
+select '209113647' ctn union all
+select '202623796' ctn union all
+select '208011865' ctn union all
+select '203126185' ctn union all
+select '208279307' ctn union all
+select '205017261' ctn union all
+select '202549936' ctn union all
+select '203459651' ctn union all
+select '203958433' ctn union all
+select '205032134' ctn union all
+select '205956399' ctn union all
+select '205294571' ctn union all
+select '205045935' ctn union all
+select '202960536' ctn union all
+select '203504016' ctn union all
+select '205319432' ctn union all
+select '203467312' ctn union all
+select '205308392' ctn;
+
+/*
+select distinct t.ctn,coalesce(i.tgt_offer_cd,ii.tgt_offer_cd) tgt_offer_cd,o.offer_id,m.Src_SOC_Cd,o.offer_Type,o.order_name
+-- ,o.* 
+from MDM.INS_OFFER o
+join LEGACY.top_100_ctn t
+on o.USER_ID=t.ctn
+left outer join M_IDID_OFFER_LDR i
+on o.offer_id=i.relat_offer_id
+left outer join M_IDID_OFFER_SPLIT_LDR ii
+on o.offer_id=ii.relat_offer_id
+left outer join LEGACY.M_OFFER_MAP m
+on i.tgt_offer_cd=m.Tgt_Offer_Cd
+where 1=1
+order by 1,5,3
+;
+*/
+
+call LEGACY.createindex_ifnotexists('MDM','INS_OFFER','USER_ID');
+call LEGACY.createindex_ifnotexists('MDM','INS_PROD','OFFER_INST_ID');
+call LEGACY.createindex_ifnotexists('MDM','INS_PROD_INS_SRV','PROD_INST_ID');
+call LEGACY.createindex_ifnotexists('MDM','INS_SRV_ATTR','PROD_SRV_RELAT_ID');
+
+select CTN,OFFER_ID,OFFER_TYPE,ORDER_NAME,PROD_ID,PROD_TYPE,PROD_NAME,SERVICE_ID,SERVICE_NAME,ATTR_ID,ATTR_NAME,ATTR_VALUE
+from (
+select t.ctn,
+o.OFFER_INST_ID,o.OFFER_ID,o.OFFER_TYPE,o.ORDER_NAME,
+p.PROD_INST_ID,p.PROD_ID,p.PROD_TYPE,pi.VERIS_OBJECT_NAME PROD_NAME,
+ps.PROD_SRV_RELAT_ID,ps.SERVICE_ID,psi.SERVICE_NAME,
+a.ATTR_INST_ID,a.ATTR_ID,a.ATTR_VALUE,ai.SERVICE_ATTR_NAME ATTR_NAME
+from LEGACY.top_100_ctn t
+left outer join MDM.INS_OFFER o
+on t.ctn=o.USER_ID
+left outer join MDM.INS_PROD p
+on o.OFFER_INST_ID=p.OFFER_INST_ID
+left outer join MDM.INS_PROD_INS_SRV ps
+on p.PROD_INST_ID=ps.PROD_INST_ID
+left outer join MDM.INS_SRV_ATTR a
+on ps.PROD_SRV_RELAT_ID=a.PROD_SRV_RELAT_ID
+left outer join LEGACY.M_IDID_ATTR_LDR ai
+on a.SERVICE_ID=ai.SERVICE_ID
+and a.ATTR_ID=ai.SERVICE_ATTR_ID
+left outer join (select SERVICE_ID,max(SERVICE_NAME) SERVICE_NAME from LEGACY.M_IDID_ATTR_LDR group by SERVICE_ID) psi
+on ps.SERVICE_ID=psi.SERVICE_ID
+left outer join (select VERIS_OBJECT_ID,max(VERIS_OBJECT_NAME) VERIS_OBJECT_NAME from LEGACY.M_IDID_OFFER_LDR group by VERIS_OBJECT_ID) pi
+on p.PROD_ID=pi.VERIS_OBJECT_ID
+) x
+-- where ctn=203176140
+order by CTN,OFFER_TYPE,PROD_NAME
+;
