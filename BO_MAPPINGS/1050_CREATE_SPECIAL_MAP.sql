@@ -235,8 +235,30 @@ values
 (6,'POS','1Min','%','+','AUTPARN01','CARPAR','MGEN_IMSI','=',2,'insert','ACARCARD',20006069,'1Min','PP_Autoskartya Uzleti_Voice billing increment #02',800012,880012,2300001,'Car card IMSI','='),
 (6,'POS','1Sec after 1Min','%','+','AUTPARN01','CARPAR','RESLEV','=',2,'insert','ACARCARD',20006071,'1Sec after 1Min','PP_Autoskartya Uzleti_Voice billing increment #03',800012,880012,2300013,'Car card restriction level','='),
 (6,'POS','1Sec after 1Min','%','+','AUTPARN01','CARPAR','SECCTN','=',2,'insert','ACARCARD',20006071,'1Sec after 1Min','PP_Autoskartya Uzleti_Voice billing increment #03',800012,880012,2300000,'Car card MSISDN','='),
-(6,'POS','1Sec after 1Min','%','+','AUTPARN01','CARPAR','MGEN_IMSI','=',2,'insert','ACARCARD',20006071,'1Sec after 1Min','PP_Autoskartya Uzleti_Voice billing increment #03',800012,880012,2300001,'Car card IMSI','=')
+(6,'POS','1Sec after 1Min','%','+','AUTPARN01','CARPAR','MGEN_IMSI','=',2,'insert','ACARCARD',20006071,'1Sec after 1Min','PP_Autoskartya Uzleti_Voice billing increment #03',800012,880012,2300001,'Car card IMSI','='),
+-- -- MT: olyan SOC-ok, amik feature utjan kerulnek special agra (SOC/FEA particiohoz):
+(9,'','','','',   'MTSMSUZL', 'EDSZPS',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'MTSMSUZL', 'CPKG',     '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'HBPAN215', 'VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'LIMITN243','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PASZ2P042','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PR+NMP045','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRA+NH043','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRA+NN043','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRAFLP047','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRALAP017','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRAPAH015','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRAPAN015','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRAPAN056','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRAPER013','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRASZH041','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRASZN041','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRASZP042','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRASZP052','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRNETP046','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'',''),
+(9,'','','','',   'PRPLUN044','VMPBSC',   '','',null,'info','',null,'','',null,null,null,'','')
 ;
+
 
 -- Elirasokat, Excelbol valo athozas kezdo-zaro szokozeit javitom:
 update LEGACY.M_SPECIAL_MAP

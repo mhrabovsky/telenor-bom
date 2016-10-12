@@ -78,6 +78,8 @@ CREATE TABLE M_IDID_ATTR_MOD
 ,   Product_Mapping_Type    VARCHAR(30)         NULL
 ,   Feature_Cd              VARCHAR(100)        NULL
 ,   Source_Name             VARCHAR(100)        NULL
+,   Legacy_Param_Name       VARCHAR(100)        NULL
+,   Legacy_Param_Desc       VARCHAR(250)        NULL
 )
 ;
 
@@ -350,10 +352,12 @@ INTO    M_IDID_ATTR_MOD
 ,       Product_Mapping_Type
 ,       Feature_Cd
 ,       Source_Name
+,	LEGACY_PARAM_NAME
+,	LEGACY_PARAM_DESC
 )
 SELECT
 --
-        New_Id2Id_Rec_Id    AS  Id2Id_Rec_Id
+        Id2Id_Rec_Id
 --
 ,       Product_Id
 ,       Product_Name
@@ -368,20 +372,15 @@ SELECT
 ,       Product_Mapping_Type
 ,       Feature_Cd
 ,       Source_Name
+,LEGACY_PARAM_NAME,LEGACY_PARAM_DESC
 --
 FROM (
-  select @ii:=@ii+1 New_Id2Id_Rec_Id,x.*
-  from (
-    select 
-    x.*,@i := case WHEN @part = concat(x.Product_Id, x.Service_Id) THEN @i:=@i + 1 ELSE @i:=1 END AS grp_seq
-    ,@part := concat(x.Product_Id, x.Service_Id) AS work
-    from (
       SELECT
       --
               (CASE WHEN (COALESCE(D.Cnt_Dist_Attr,0) > 1) THEN 'N' ELSE 'Y' END) AS  Attr_OK
       ,       (CASE WHEN (D.Product_Id IS NOT NULL) THEN 'Y' ELSE 'N' END)        AS  Service_Multi
       --
-      ,       A.Id2Id_Rec_Id                                                      AS  Old_Id2Id_Rec_Id
+      ,       A.Id2Id_Rec_Id
       --
       ,       A.Product_Id
       ,       A.Product_Name
@@ -397,6 +396,8 @@ FROM (
       ,       A.Feature_Cd
       ,       A.Source_Name
       --
+      ,SPLIT_STR(coalesce(A.LEGACY_PARAM_NAME,'-'),';',nn.nr) LEGACY_PARAM_NAME,A.LEGACY_PARAM_DESC
+
       FROM M_IDID_ATTR   AS  A
       LEFT JOIN  (
         SELECT  Product_Id
@@ -412,15 +413,11 @@ FROM (
         ) AS  D
         ON    A.Product_Id = D.Product_Id
         AND   A.Service_Id = D.Service_Id
-        where A.Product_Id is not null
-      ORDER BY A.Product_Id, A.Service_Id
-             ,(CASE WHEN (A.Feature_Cd IS NOT NULL) THEN 1 ELSE 2 END) ASC   --  van Feature_Cd
-             ,(CASE Map_Type WHEN 'B2C' THEN 1 ELSE 2 END)                   --  B2C -> B2B
-             , Service_Attr_Id
-      ) x,(select @part:='-',@i:=0) i
-    ) x,(select@ii:=700000) i
-  where x.grp_seq=1
-  ) AS  Q
+        join (select @s := @s+1 nr from M_IDID_ATTR_LDR, (select @s:=0) y limit 100) nn on 1=1
+having LEGACY_PARAM_NAME<>''
+
+) x
+where Product_Id is not null
 ;
 
 --
