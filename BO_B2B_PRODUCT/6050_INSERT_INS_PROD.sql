@@ -1,11 +1,15 @@
 -- 6050.
+
+-- NAS 10.04 beegetesek bovitese
+SET @PROD_INST_ID = LEGACY.CONFIG('PROD_INST_ID',null);
+SET @EFF_DT = CAST(LEGACY.CONFIG('DEF_EFF_DATE',NULL) AS DATETIME);
+SET @EXP_DT = CAST(LEGACY.CONFIG('DEF_EXP_DATE',NULL) AS DATETIME);
+SET @SYS_DATE = CAST(LEGACY.CONFIG('SYS_DATE',NULL) AS DATETIME);
+
 call LEGACY.createindex_ifnotexists('LEGACY','BO_ID2ID_MAIN_OFFER_LDR','OFFER_ID');
 call LEGACY.createindex_ifnotexists('LEGACY','M_OFFER_M20_MERGE_ALL','Tgt_Offer_Id');
 call LEGACY.createindex_ifnotexists('LEGACY','SOC_FEATURE_OFFER_MAPPING','CTN,VERIS_PRODUCT_ID');
 call LEGACY.createindex_ifnotexists('MDM','INS_USER','USER_ID');
-
--- NAS 10.04 beégetések bõvítése
-SET @PROD_INST_ID = LEGACY.CONFIG('PROD_INST_ID',null);
 
 INSERT INTO MDM.INS_PROD
 (
@@ -34,20 +38,20 @@ SELECT DISTINCT
     ,M.VERIS_PRODUCT_ID
     ,M.MDM_TYPE
     ,'0'
-    ,CASE WHEN M.FEATURE_EXPIRATION_DATE < SYSDATE()
+    ,CASE WHEN M.FEATURE_EXPIRATION_DATE < @SYS_DATE
             THEN '7'
           ELSE '1'
      END
     ,CASE WHEN M.FEATURE_EFFECTIVE_DATE IS NULL
-            THEN '1900-01-01 00:00:00'
+            THEN @EFF_DT
           WHEN M.FEATURE_EFFECTIVE_DATE > M.FEATURE_EXPIRATION_DATE
             THEN M.FEATURE_EXPIRATION_DATE
           ELSE M.FEATURE_EFFECTIVE_DATE
      END                                                        AS EFFECTIVE_DATE
     ,CASE WHEN M.FEATURE_EXPIRATION_DATE IS NULL
-            THEN '2099-12-31 23:59:59'
-          WHEN M.FEATURE_EXPIRATION_DATE > '2099-12-31 23:59:59'
-            THEN '2099-12-31 23:59:59'
+            THEN @EXP_DT
+          WHEN M.FEATURE_EXPIRATION_DATE > @EXP_DT
+            THEN @EXP_DT
           ELSE M.FEATURE_EXPIRATION_DATE
      END                                                        AS EXPIRE_DATE
 
@@ -88,8 +92,8 @@ select
     ,'PRICE_PROD'                                   AS PROD_TYPE
     ,'0'                                            AS EXPIRE_PROCESS_TYPE
     ,'1'                                            AS STATE
-    ,'1900-01-01 00:00:00'                          AS EFFECTIVE_DATE
-    ,'2099-12-31 23:59:59'                          AS EXPIRE_DATE
+    ,@EFF_DT                                        AS EFFECTIVE_DATE
+    ,@EXP_DT                                        AS EXPIRE_DATE
 
 FROM    LEGACY.SOC_FEATURE_OFFER_MAPPING            AS F
 --    FORCE INDEX (IDX_SOC_FEATURE_OFFER_MAPPING_VERIS_OFFER_ID)
@@ -142,8 +146,8 @@ select
     ,'SRVC_SINGLE'                                  AS PROD_TYPE
     ,'0'                                            AS EXPIRE_PROCESS_TYPE
     ,'1'                                            AS STATE
-    ,'1900-01-01 00:00:00'                          AS EFFECTIVE_DATE
-    ,'2099-12-31 23:59:59'                          AS EXPIRE_DATE
+    ,@EFF_DT                                        AS EFFECTIVE_DATE
+    ,@EXP_DT                                        AS EXPIRE_DATE
 FROM
 LEGACY.SOC_FEATURE_OFFER_MAPPING F
  join LEGACY.BO_ID2ID_ADDON_OFFER_LDR ia

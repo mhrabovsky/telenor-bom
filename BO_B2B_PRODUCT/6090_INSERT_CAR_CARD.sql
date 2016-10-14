@@ -1,4 +1,6 @@
--- NAS 10.04 beégetések bővítése
+-- 6090
+
+-- NAS 10.04 beegetesek bovitese
 SET @BASE = LEGACY.CONFIG('ATTR_INST_ID', null);
 
 call LEGACY.createindex_ifnotexists('LEGACY','M_FEATURE_EXTR','Sub_Id');

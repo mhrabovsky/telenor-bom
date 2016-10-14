@@ -2,18 +2,21 @@
 *  File: 6085_INSERT_INS_SRV_ATTR.sql
 *  Created: 2016.09.27 - HL
 *  Desc: Olyan attribútumok létrehozása, melyeket korábban kizártak, mert több soruk felelt meg egy productid-serviceid-nak.
-*  Modifications:
-*
+*  Modifications: 
+*  - 20161011_HL: M_IDID_ATTR_LDR helyett M_IDID_ATTR_MOD-ot hasznalunk
+*  - 20161004_NS: beegetesek bovitese
 ********************************************************************************/
 
--- NAS 10.04 beégetések bõvítése
 SET @BASE = LEGACY.CONFIG('ATTR_INST_ID', null);
+SET @EFF_DT = CAST(LEGACY.CONFIG('DEF_EFF_DATE',NULL) AS DATETIME);
+SET @EXP_DT = CAST(LEGACY.CONFIG('DEF_EXP_DATE',NULL) AS DATETIME);
+SET @SYS_DATE = CAST(LEGACY.CONFIG('SYS_DATE',NULL) AS DATETIME);
 
 CALL LEGACY.createindex_ifnotexists('MDM','INS_PROD_INS_SRV','USER_ID');
 CALL LEGACY.createindex_ifnotexists('MDM','INS_SRV_ATTR','USER_ID');
 CALL LEGACY.createindex_ifnotexists('LEGACY','M_FEATURE_ATTRS','Sub_Id');
 CALL LEGACY.createindex_ifnotexists('LEGACY','M_FEATURE_ATTRS','ATTR_CODE');
-CALL LEGACY.createindex_ifnotexists('LEGACY','M_IDID_ATTR_LDR','LEGACY_PARAM_NAME');
+CALL LEGACY.createindex_ifnotexists('LEGACY','M_IDID_ATTR_MOD','LEGACY_PARAM_NAME');
 
 SET @rownum := (SELECT max(cast(SUBSTR(ATTR_INST_ID, 10) as UNSIGNED)) FROM MDM.INS_SRV_ATTR);
 
@@ -44,24 +47,24 @@ SELECT
     F.ATTR_VAL ATTR_VALUE,
     F.ATTR_VAL ATTR_TEXT,
     CASE
-        WHEN F.ftr_expiration_date < SYSDATE() THEN '7'
+        WHEN F.ftr_expiration_date < @SYS_DATE THEN '7'
         ELSE '1'
     END STATE,
     '99' SORT_ID,
     'null' ATTR_BATCH,
     CASE
-        WHEN ftr_effective_date IS NULL THEN '1900-01-01 00:00:00'
+        WHEN ftr_effective_date IS NULL THEN @EFF_DT
         WHEN ftr_effective_date > ftr_expiration_date THEN ftr_expiration_date
         ELSE ftr_effective_date
     END AS EFFECTIVE_DATE,
     CASE
-        WHEN ftr_expiration_date IS NULL THEN '2099-12-31 23:59:59'
-        WHEN ftr_expiration_date > '2099-12-31 23:59:59' THEN '2099-12-31 23:59:59'
+        WHEN ftr_expiration_date IS NULL THEN @EXP_DT
+        WHEN ftr_expiration_date > @EXP_DT THEN @EXP_DT
         ELSE ftr_expiration_date
     END AS EXPIRE_DATE
 FROM
     LEGACY.M_FEATURE_ATTRS F,
-    LEGACY.M_IDID_ATTR_LDR A,
+    LEGACY.M_IDID_ATTR_MOD A,
     MDM.INS_PROD_INS_SRV S -- FORCE INDEX (IDX_INS_PROD_INS_SRV_10)
 WHERE
     A.LEGACY_PARAM_NAME = F.ATTR_CODE

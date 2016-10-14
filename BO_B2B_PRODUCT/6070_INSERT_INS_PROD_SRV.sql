@@ -1,4 +1,8 @@
--- NAS 10.04 beégetések bõvítése
+-- 6070
+
+-- NAS 10.04 beegetesek bovitese
+-- 20161011_HL: FEAUTURE, M_IDID_ATTR_LDR helyett M_IDID_ATTR_MOD-ot hasznalunk
+
 SET @PROD_SRV_RELAT_ID = LEGACY.CONFIG('PROD_SRV_RELAT_ID',null);
 
 INSERT INTO MDM.INS_PROD_INS_SRV
@@ -62,7 +66,7 @@ P.USER_ID,
 I.SERV_ID,
 P.STATE
 FROM MDM.INS_PROD P
-join (select distinct PRODUCT_ID PROD_ID, SERVICE_ID SERV_ID from LEGACY.M_IDID_ATTR_LDR) I
+join (select distinct PRODUCT_ID PROD_ID, SERVICE_ID SERV_ID from LEGACY.M_IDID_ATTR_MOD) I
 on P.PROD_ID = I.PROD_ID
 join (select @rownum:=0) r on 1=1
 left outer join MDM.INS_PROD_INS_SRV PS

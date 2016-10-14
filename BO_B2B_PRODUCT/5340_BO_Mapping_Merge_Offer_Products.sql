@@ -34,6 +34,7 @@ USE LEGACY;
  *  1.1   2016/05/03    Berkó Tamás
  *        OPP project - BO Migration
  *        - DR2 preparation
+ * -- 20161011_HL: FEAUTURE, M_IDID_ATTR_LDR helyett M_IDID_ATTR_MOD-ot hasznalunk
  *
  ****************************************************************************
 */
@@ -141,7 +142,7 @@ CREATE TABLE LEGACY.M_OFFER_M10_MERGE_PRD_W as
   ,       PRD.Feature_Cd
   FROM
                       /*${WORK_TB}*/ M_IDID_OFFER_MOD   AS  OFR
-          LEFT  JOIN  /*${WORK_TB}*/ M_IDID_ATTR_MOD    AS  PRD
+          LEFT  JOIN  /*${WORK_TB}*/ (SELECT DISTINCT Product_Id, Feature_Cd FROM M_IDID_ATTR_MOD)    AS  PRD
                   ON  (
                           OFR.Veris_Object_Id = PRD.Product_Id
                       )

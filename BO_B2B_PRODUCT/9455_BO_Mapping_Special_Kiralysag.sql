@@ -9,6 +9,10 @@ Felrakando az A3ONNET50MB addon is, ami egy leforgalmazhato 50MB-os internet.
 
 */
 
+-- NAS 10.11 beegetesek bovitese
+SET @EFF_DT = CAST(LEGACY.CONFIG('DEF_EFF_DATE',NULL) AS DATETIME);
+SET @EXP_DT = CAST(LEGACY.CONFIG('DEF_EXP_DATE',NULL) AS DATETIME);
+SET @SYS_DATE = CAST(LEGACY.CONFIG('SYS_DATE',NULL) AS DATETIME);
 
 set @i=0;
 
@@ -17,12 +21,12 @@ set @i=0;
 insert into LEGACY.M_A3ONNET_SRV
 select
   CASE
-    WHEN F.FTR_EFFECTIVE_DATE > '2099-12-31 23:59:59' THEN '1900-01-01 00:00:00'
-    ELSE COALESCE(F.FTR_EFFECTIVE_DATE,'1900-01-01 00:00:00')
+    WHEN F.FTR_EFFECTIVE_DATE > @EXP_DT THEN @EFF_DT
+    ELSE COALESCE(F.FTR_EFFECTIVE_DATE, @EFF_DT)
     END            AS EFFECTIVE_DATE,
   CASE 
-    WHEN F.FTR_EXPIRATION_DATE > '2099-12-31 23:59:59' THEN '2099-12-31 23:59:59'
-    ELSE COALESCE(F.FTR_EXPIRATION_DATE,'2099-12-31 23:59:59')
+    WHEN F.FTR_EXPIRATION_DATE > @EXP_DT THEN @EXP_DT
+    ELSE COALESCE(F.FTR_EXPIRATION_DATE, @EXP_DT)
     END            AS EXPIRATION_DATE,
   replace(replace(replace(replace(F.txt_to_split,'@',','),'NR1=',''),'NR2=',''),'NR3=','') TEL,
   '31000281'  SERVICE_ID,
@@ -35,7 +39,7 @@ select
   null OFFER_ID,
   null CUST_ID,
   null CUST_TYPE
-from M_FEATURE_EXTR_SL F
+from M_FEATURE_USED PARTITION (pSA) F
 join MDM.INS_PROD   P
   on P.PROD_ID='1000281'
   and P.USER_ID=F.Sub_Id
@@ -96,8 +100,8 @@ SELECT
   substring_index(substring_index(TEL,',',N.N),',',-1) ATTR_VALUE,
   substring_index(substring_index(TEL,',',N.N),',',-1) ATTR_TEXT,
   CASE
-    WHEN EXPIRATION_DATE < SYSDATE() THEN '7'
-    WHEN EFFECTIVE_DATE  > SYSDATE() THEN '7'
+    WHEN EXPIRATION_DATE < @SYS_DATE THEN '7'
+    WHEN EFFECTIVE_DATE  > @SYS_DATE THEN '7'
     ELSE '1'
     END STATE,
   null               , -- legacy.sort_id

@@ -1,5 +1,12 @@
--- NAS 10.04 beégetések bõvítése
+-- 6080
+
+-- NAS 10.04 beegetesek bovitese
+-- 20161011_HL INS_SRV_ATTR ATTR_TEXT oszlopaba SERVICE_ATTR_VALUE/100 kerul, ha a VERIS_SERVICE_ATTR_ID 820001
+
 SET @BASE = LEGACY.CONFIG('ATTR_INST_ID', null);
+SET @EFF_DT = CAST(LEGACY.CONFIG('DEF_EFF_DATE',NULL) AS DATETIME);
+SET @EXP_DT = CAST(LEGACY.CONFIG('DEF_EXP_DATE',NULL) AS DATETIME);
+SET @SYS_DATE = CAST(LEGACY.CONFIG('SYS_DATE',NULL) AS DATETIME);
 
 INSERT INTO MDM.INS_SRV_ATTR
 (
@@ -28,23 +35,23 @@ SELECT
     ,X.VERIS_SERVICE_ID                                             -- SERVICE_ID
     ,X.VERIS_SERVICE_ATTR_ID                                        -- ATTR_ID
     ,X.SERVICE_ATTR_VALUE                                           -- ATTR_VALUE
-    ,X.SERVICE_ATTR_VALUE                                           -- ATTR_TEXT
-    ,CASE WHEN FEATURE_EXPIRATION_DATE < SYSDATE()
+    ,CASE WHEN X.VERIS_SERVICE_ATTR_ID = 820001 THEN X.SERVICE_ATTR_VALUE/100 ELSE X.SERVICE_ATTR_VALUE END  -- ATTR_TEXT
+    ,CASE WHEN FEATURE_EXPIRATION_DATE < @SYS_DATE
             THEN '7'
           ELSE '1'
      END                                                            -- STATE
     ,'99'                                                           -- SORT_ID
     ,'null'                                                         -- ATTR_BATCH
     ,CASE WHEN FEATURE_EFFECTIVE_DATE IS NULL
-            THEN '1900-01-01 00:00:00'
+            THEN @EFF_DT
           WHEN FEATURE_EFFECTIVE_DATE > FEATURE_EXPIRATION_DATE
             THEN FEATURE_EXPIRATION_DATE
           ELSE FEATURE_EFFECTIVE_DATE
      END                                                            AS EFFECTIVE_DATE
     ,CASE WHEN FEATURE_EXPIRATION_DATE IS NULL
-            THEN '2099-12-31 23:59:59'
-          WHEN FEATURE_EXPIRATION_DATE > '2099-12-31 23:59:59'
-            THEN '2099-12-31 23:59:59'
+            THEN @EXP_DT
+          WHEN FEATURE_EXPIRATION_DATE > @EXP_DT
+            THEN @EXP_DT
           ELSE FEATURE_EXPIRATION_DATE
      END                                                            AS EXPIRE_DATE
 
